@@ -16,25 +16,25 @@ function bindActionCreator<A extends AnyAction = AnyAction>(
 }
 
 /**
- * Turns an object whose values are action creators, into an object with the
- * same keys, but with every function wrapped into a `dispatch` call so they
- * may be invoked directly. This is just a convenience method, as you can call
- * `store.dispatch(MyActionCreators.doSomething())` yourself just fine.
+ * アクションクリエーターを値に持つオブジェクトを、同じキーを持つオブジェクトに変換します。
+ * 同じキーを持つオブジェクトに変換しますが、すべての関数は `dispatch` コールにラップされているので
+ * 直接呼び出すことができます。これは単なる便宜的なメソッドで、次のように呼び出すことができます。
+ * `store.dispatch(MyActionCreators.doSomething())` を自分で呼び出すこともできます。
  *
- * For convenience, you can also pass an action creator as the first argument,
- * and get a dispatch wrapped function in return.
+ * 便宜上、第一引数にアクションクリエイターを渡すこともできます。
+ * 便宜上、アクションクリエイターを第一引数として渡し、ディスパッチをラップした関数を返すこともできます。
  *
- * @param actionCreators An object whose values are action
- * creator functions. One handy way to obtain it is to use ES6 `import * as`
- * syntax. You may also pass a single function.
+ * @param actionCreators アクションクリエイター関数の値を持つオブジェクトです。
+ * クリエイター関数です。これを取得する便利な方法のひとつが、ES6の `import * as`
+ * 構文で取得できます。1つの関数を渡すこともできます。
  *
- * @param dispatch The `dispatch` function available on your Redux
+ * @param dispatch Reduxで利用可能な`dispatch`関数です。
  * store.
  *
- * @returns The object mimicking the original object, but with
- * every action creator wrapped into the `dispatch` call. If you passed a
- * function as `actionCreators`, the return value will also be a single
- * function.
+ * @returns 元のオブジェクトを模倣したオブジェクトです。
+ * すべてのアクションは `dispatch` にラップされています。関数を `actionCreators` として渡した場合
+ * 関数を `actionCreators` として渡した場合は、戻り値も単一の
+ * 関数になります。
  */
 export default function bindActionCreators<A, C extends ActionCreator<A>>(
   actionCreator: C,

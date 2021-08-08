@@ -93,22 +93,22 @@ function assertReducerShape(reducers: ReducersMapObject) {
 }
 
 /**
- * Turns an object whose values are different reducer functions, into a single
- * reducer function. It will call every child reducer, and gather their results
- * into a single state object, whose keys correspond to the keys of the passed
- * reducer functions.
+ * 異なるレデューサー関数を値とするオブジェクトを、1つの
+ * レデューサ関数に変換します。この関数は、すべての子リデューサを呼び出し、その結果を1つのステートオブジェクトにまとめます。
+ * そのキーは、渡されたリデューサ関数のキーに対応しています。
+ * リデューサ関数のキーに対応する。
  *
- * @template S Combined state object type.
+ * @template S 結合状態オブジェクトタイプ。
  *
- * @param reducers An object whose values correspond to different reducer
- *   functions that need to be combined into one. One handy way to obtain it
- *   is to use ES6 `import * as reducers` syntax. The reducers may never
- *   return undefined for any action. Instead, they should return their
- *   initial state if the state passed to them was undefined, and the current
- *   state for any unrecognized action.
+ * @param reducers 1つにまとめる必要のある異なるレデューサ関数に対応する値を持つオブジェクト。
+ * 関数に対応する値を持つオブジェクトです。これを取得する便利な方法のひとつは
+ * ES6の `import * as reducers` 構文を使うのが便利です。レデューサは、決して
+ * どのようなアクションに対してもundefinedを返してはいけません。その代わりに、以下のようなものを返します。
+ * その代わり、渡された状態が未定義の場合は初期状態を、認識できない場合は現在の状態を返します。
+ * 認識されていないアクションに対しては、現在の状態を返します。
  *
- * @returns A reducer function that invokes every reducer inside the passed
- *   object, and builds a state object with the same shape.
+ * @returns 渡されたオブジェクト内のすべてのレデューサを呼び出し、ステートオブジェクトを構築するレデューサ関数です。
+ * 同じ形状のstateオブジェクトを構築する。
  */
 export default function combineReducers<S>(
   reducers: ReducersMapObject<S, any>

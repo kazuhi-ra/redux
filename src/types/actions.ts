@@ -1,30 +1,32 @@
 /**
- * An *action* is a plain object that represents an intention to change the
- * state. Actions are the only way to get data into the store. Any data,
- * whether from UI events, network callbacks, or other sources such as
- * WebSockets needs to eventually be dispatched as actions.
+ * アクション*は、状態を変更する意図を表すプレーンなオブジェクトです。
+ * 状態を変更する意図を表すプレーンなオブジェクトです。アクションは、データをストアに入れる唯一の方法です。どんなデータでも
+ * UIイベント、ネットワークコールバック、またはWebSocketのような他のソースからのデータは、最終的にアクションとしてディスパッチされる必要があります。
+ * WebSocketからのデータは、最終的にアクションとしてディスパッチされる必要があります。
  *
- * Actions must have a `type` field that indicates the type of action being
- * performed. Types can be defined as constants and imported from another
- * module. It's better to use strings for `type` than Symbols because strings
- * are serializable.
+ * アクションには、実行されるアクションのタイプを示す `type` フィールドが必要です。
+ * アクションには、実行されるアクションのタイプを示す `type` フィールドが必要です。タイプは定数として定義し、他のモジュールからインポートすることができます。
+ * モジュールからインポートすることができます。type` にはシンボルよりも文字列を使ったほうがいいでしょう。
+ * 文字列はシリアライズ可能です。
  *
- * Other than `type`, the structure of an action object is really up to you.
- * If you're interested, check out Flux Standard Action for recommendations on
- * how actions should be constructed.
+ * `type` 以外のアクションオブジェクトの構造は、あなた次第です。
+ * 興味のある方は、Flux Standard Actionをチェックしてみてください。
+ * アクションをどのように構築すべきかについての推奨事項です。
  *
- * @template T the type of the action's `type` tag.
+ * @template T アクションの `type` タグのタイプを指定します。
  */
+
 export interface Action<T = any> {
   type: T
 }
 
 /**
- * An Action type which accepts any other properties.
- * This is mainly for the use of the `Reducer` type.
- * This is not part of `Action` itself to prevent types that extend `Action` from
- * having an index signature.
+ * 任意の他のプロパティを受け入れる Action タイプです。
+ * これは主に `Reducer` タイプを使用するためのものです。
+ * これは、`Action` を拡張した型がインデックス署名を持つことを防ぐために、`Action` 自身の一部ではありません。
+ * インデックスシグネチャを持つ。
  */
+
 export interface AnyAction extends Action {
   // Allows any extra properties to be defined in an action.
   [extraProps: string]: any
@@ -33,28 +35,29 @@ export interface AnyAction extends Action {
 /* action creators */
 
 /**
- * An *action creator* is, quite simply, a function that creates an action. Do
- * not confuse the two terms—again, an action is a payload of information, and
- * an action creator is a factory that creates an action.
+ *アクションクリエイター*とは、簡単に言えば、アクションを作成する関数です。この2つの用語を混同しないでください。
+ * この2つの用語を混同しないでください。
+ * アクションクリエイターとは、アクションを作成するファクトリーのことです。
  *
- * Calling an action creator only produces an action, but does not dispatch
- * it. You need to call the store's `dispatch` function to actually cause the
- * mutation. Sometimes we say *bound action creators* to mean functions that
- * call an action creator and immediately dispatch its result to a specific
- * store instance.
+ * アクションクリエイターを呼び出しても、アクションを生成するだけで、ディスパッチはしません。
+ * しません。実際に変異を起こすには、ストアの `dispatch` 関数を呼び出す必要があります。
+ * 変異させる必要があります。アクションクリエータを呼び出すと、すぐにアクションを実行することができます。
+ アクションクリエイターを呼び出し、その結果を特定のストアインスタンスに即座にディスパッチする関数を意味して、 *バウンドアクショニスト* と呼ぶことがあります。
+ * ストアのインスタンスにディスパッチする関数を意味します。
  *
- * If an action creator needs to read the current state, perform an API call,
- * or cause a side effect, like a routing transition, it should return an
- * async action instead of an action.
+ * アクションクリエイターが現在の状態を読み取ったり、APIコールを実行したりする必要がある場合。
+ * アクションクリエイターが現在の状態を読み取ったり、APIコールを実行したり、ルーティングトランジションのような副作用を引き起こす必要がある場合は、非同期アクションを返す必要があります。
+ * アクションの代わりに非同期アクションを返す必要があります。
  *
- * @template A Returned action type.
+ * @template A 返されるアクションタイプ。
  */
+
 export interface ActionCreator<A, P extends any[] = any[]> {
   (...args: P): A
 }
 
 /**
- * Object whose values are action creator functions.
+ * アクションクリエイター関数を値とするオブジェクト。
  */
 export interface ActionCreatorsMapObject<A = any, P extends any[] = any[]> {
   [key: string]: ActionCreator<A, P>

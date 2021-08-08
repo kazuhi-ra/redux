@@ -6,18 +6,18 @@ export interface MiddlewareAPI<D extends Dispatch = Dispatch, S = any> {
 }
 
 /**
- * A middleware is a higher-order function that composes a dispatch function
- * to return a new dispatch function. It often turns async actions into
- * actions.
+ * ミドルウェアは、ディスパッチ関数を合成する高次の関数です。
+ * を合成して、新しいディスパッチ関数を返す高次関数です。ミドルウェアはしばしば、非同期アクションを
+ * アクションに変換します。
  *
- * Middleware is composable using function composition. It is useful for
- * logging actions, performing side effects like routing, or turning an
- * asynchronous API call into a series of synchronous actions.
+ * ミドルウェアは、関数の合成によって構成されています。これは以下のような場合に便利です。
+ * 非同期APIコールを一連の同期アクションに変換することができます。
+ * 非同期のAPIコールを一連の同期アクションにするのに便利です。
  *
- * @template DispatchExt Extra Dispatch signature added by this middleware.
- * @template S The type of the state supported by this middleware.
- * @template D The type of Dispatch of the store where this middleware is
- *   installed.
+ * @template DispatchExt 本ミドルウェアが追加するDispatch署名。
+ * @template S このミドルウェアがサポートする状態のタイプ。
+ * @template D このミドルウェアがインストールされているストアのDispatchの種類。
+ * インストールされる。
  */
 export interface Middleware<
   _DispatchExt = {}, // TODO: remove unused component (breaking change)

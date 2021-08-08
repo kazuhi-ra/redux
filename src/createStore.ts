@@ -15,29 +15,29 @@ import isPlainObject from './utils/isPlainObject'
 import { kindOf } from './utils/kindOf'
 
 /**
- * Creates a Redux store that holds the state tree.
- * The only way to change the data in the store is to call `dispatch()` on it.
+ * ステートツリーを保持するReduxストアを作成します。
+ * ストア内のデータを変更する唯一の方法は、ストア上で `dispatch()` を呼び出すことです。
  *
- * There should only be a single store in your app. To specify how different
- * parts of the state tree respond to actions, you may combine several reducers
- * into a single reducer function by using `combineReducers`.
+ * アプリ内には1つのストアしか存在してはいけません。ステートツリーの異なる部分がどのように反応するかを指定するには
+ * ステートツリーの異なる部分がアクションに反応する方法を指定するために、複数のリデューサを1つのリデューサ関数にまとめることができます。
+ * 複数のリデューサを1つのリデューサ関数にまとめるには、`combineReducers`を使います。
  *
- * @param reducer A function that returns the next state tree, given
- * the current state tree and the action to handle.
+ * @param reducer 現在のステートツリーとアクションが与えられたときに、次のステートツリーを返す関数です。
+ * 現在のステートツリーと、処理するアクションが与えられると、次のステートツリーを返す関数です。
  *
- * @param preloadedState The initial state. You may optionally specify it
- * to hydrate the state from the server in universal apps, or to restore a
- * previously serialized user session.
- * If you use `combineReducers` to produce the root reducer function, this must be
- * an object with the same shape as `combineReducers` keys.
+ * @param preloadedState 初期状態です。オプションで指定することができます。
+ * ユニバーサルアプリでサーバからの状態をハイドレートする場合や、 * 以前にシリアライズされたユーザーセッションを復元する場合に、 * オプションで指定することができます。
+ * オプションで指定できます。
+ * `combineReducers` を使ってルートレデューサ関数を生成する場合、これは以下のものでなければなりません。
+ * `combineReducers` のキーと同じ形状のオブジェクトであること。
  *
- * @param enhancer The store enhancer. You may optionally specify it
- * to enhance the store with third-party capabilities such as middleware,
- * time travel, persistence, etc. The only store enhancer that ships with Redux
- * is `applyMiddleware()`.
+ * @param enhancer ストアのエンハンサーです。オプションで指定することができます。
+ ミドルウェアなどのサードパーティの機能でストアを強化するために * オプションで指定することができます。
+ * タイムトラベル、パーシステンスなどのサードパーティ製の機能で * ストアを強化するためにオプションで指定できます。Reduxに同梱されている唯一のストアエンハンサーは
+ * は `applyMiddleware()` です。
  *
- * @returns A Redux store that lets you read the state, dispatch actions
- * and subscribe to changes.
+ * @returns 状態の読み取り、アクションのディスパッチ、変更の購読を可能にする Redux ストア。
+ * 変更を購読することができます。
  */
 export default function createStore<
   S,
@@ -114,11 +114,11 @@ export default function createStore<
   let isDispatching = false
 
   /**
-   * This makes a shallow copy of currentListeners so we can use
-   * nextListeners as a temporary list while dispatching.
+   * currentListenersの浅いコピーを作成し、ディスパッチ中の一時的なリストとしてnextListenersを使用できるようにします。
+   * nextListenersをディスパッチ中の一時的なリストとして使用できるようにします。
    *
-   * This prevents any bugs around consumers calling
-   * subscribe/unsubscribe in the middle of a dispatch.
+   * ディスパッチ中にコンシューマーが subscribe/unubscribe を呼び出すようなバグを防ぎます。
+   * ディスパッチの最中にコンシューマが subscribe/unubscribe を呼び出すバグを防ぎます。
    */
   function ensureCanMutateNextListeners() {
     if (nextListeners === currentListeners) {
@@ -127,9 +127,9 @@ export default function createStore<
   }
 
   /**
-   * Reads the state tree managed by the store.
+   * ストアで管理されているステートツリーを読み込みます。
    *
-   * @returns The current state tree of your application.
+   * @returns アプリケーションの現在のステート・ツリーです。
    */
   function getState(): S {
     if (isDispatching) {
@@ -144,27 +144,27 @@ export default function createStore<
   }
 
   /**
-   * Adds a change listener. It will be called any time an action is dispatched,
-   * and some part of the state tree may potentially have changed. You may then
-   * call `getState()` to read the current state tree inside the callback.
+   * 変更リスナーを追加します。このリスナーは、アクションがディスパッチされるたびに呼び出されます。
+   * アクションがディスパッチされ、ステートツリーの一部が変更された可能性があるときに呼び出されます。これにより、以下のことが可能になります。
+   * コールバック内で現在のステートツリーを読み取るために、`getState()`を呼び出します。
    *
-   * You may call `dispatch()` from a change listener, with the following
-   * caveats:
+   * 変更リスナーから `dispatch()` を呼び出すことができます。
+   * 注意点は以下の通りです。
    *
-   * 1. The subscriptions are snapshotted just before every `dispatch()` call.
-   * If you subscribe or unsubscribe while the listeners are being invoked, this
-   * will not have any effect on the `dispatch()` that is currently in progress.
-   * However, the next `dispatch()` call, whether nested or not, will use a more
-   * recent snapshot of the subscription list.
+   * dispatch()を呼び出すたびに、サブスクリプションは直前にスナップショットされます。
+   * リスナーが呼び出されている間にサブスクライブやアンサブスクライブを行っても、それは変更リスナーには影響しません。
+   * 現在進行中の `dispatch()` には何の影響も与えません。
+   * ただし、次の `dispatch()` の呼び出しは、入れ子になっているかどうかに関わらず、 * より新しい購読リストのスナップショットを使用します。
+   * 最近の購読リストのスナップショットを使用します。
    *
-   * 2. The listener should not expect to see all state changes, as the state
-   * might have been updated multiple times during a nested `dispatch()` before
-   * the listener is called. It is, however, guaranteed that all subscribers
-   * registered before the `dispatch()` started will be called with the latest
-   * state by the time it exits.
+   * 2. * 2. リスナーは、すべての状態の変化を期待してはいけません。
+   * 2. リスナーは、すべての状態の変化を期待してはいけません。
+   * リスナーが呼ばれる前に、入れ子になった `dispatch()` の間に複数回ステートが更新されている可能性があるからです。しかし、リスナーが呼ばれる前に、ネストされた `dispatch()` の間に * 状態が複数回更新されている可能性があるからです。
+   * ただし、`dispatch()`が開始される前に登録されたすべてのサブスクライバは、`dispatch()`が終了するまでに最新の
+   * 状態で呼び出されることが保証されています。
    *
-   * @param listener A callback to be invoked on every dispatch.
-   * @returns A function to remove this change listener.
+   * @param listener ディスパッチごとに呼び出されるコールバックです。
+   * @returns この変更リスナーを削除する関数です。
    */
   function subscribe(listener: () => void) {
     if (typeof listener !== 'function') {
@@ -211,29 +211,29 @@ export default function createStore<
   }
 
   /**
-   * Dispatches an action. It is the only way to trigger a state change.
+   * アクションをディスパッチします。状態変化を引き起こす唯一の方法です。
    *
-   * The `reducer` function, used to create the store, will be called with the
-   * current state tree and the given `action`. Its return value will
-   * be considered the **next** state of the tree, and the change listeners
-   * will be notified.
+   * ストアの作成に使用される `reducer` 関数は、現在のステートツリーと与えられた `action` を使って呼び出されます。
+   * 現在のステートツリーと、与えられた `アクション` で呼び出されます。その戻り値は
+   * ツリーの **次** の状態とみなされ、変更リスナーに通知されます。
+   * 通知されます。
    *
-   * The base implementation only supports plain object actions. If you want to
-   * dispatch a Promise, an Observable, a thunk, or something else, you need to
-   * wrap your store creating function into the corresponding middleware. For
-   * example, see the documentation for the `redux-thunk` package. Even the
-   * middleware will eventually dispatch plain object actions using this method.
+   * 基本的な実装では、プレーンなオブジェクトアクションのみをサポートしています。もし、次のようなことをしたい場合
+   * Promise、Observable、Thunkなどをディスパッチしたい場合は、ストア作成関数を対応するミドルウェアにラップする必要があります。
+   * ストアを作成する関数を、対応するミドルウェアにラップする必要があります。例えば
+   * 例えば、`redux-thunk`パッケージのドキュメントを参照してください。ミドルウェアでも
+   * ミドルウェアでも、最終的にはプレーンなオブジェクトのアクションをこの方法でディスパッチします。
    *
-   * @param action A plain object representing “what changed”. It is
-   * a good idea to keep actions serializable so you can record and replay user
-   * sessions, or use the time travelling `redux-devtools`. An action must have
-   * a `type` property which may not be `undefined`. It is a good idea to use
-   * string constants for action types.
+   * @param action 「何が変わったか」を表すプレーンオブジェクトです。これは
+   * アクションをシリアライズ可能にしておくと、ユーザのセッションを記録・再生することができます。
+   * ユーザーのセッションを記録したり、再生したり、タイムトラベルの `redux-devtools` を使用したりするために、アクションをシリアライズ可能にしておくと良いでしょう。アクションは以下のプロパティを持つ必要があります。
+   * type` プロパティは `undefined` であってはなりません。アクションのタイプには、文字列定数を使用することをお勧めします。
+   * 文字列定数を使用することをお勧めします。
    *
-   * @returns For convenience, the same action object you dispatched.
+   * @returns 便宜上、ディスパッチしたのと同じアクションオブジェクトを返します。
    *
-   * Note that, if you use a custom middleware, it may wrap `dispatch()` to
-   * return something else (for example, a Promise you can await).
+   * カスタムミドルウェアを使用している場合、カスタムミドルウェアは `dispatch()` をラップして別のものを返すかもしれないことに注意してください。
+   * dispatch()をラップして別のものを返すことがあります（例えば、waitできるPromiseなど）。
    */
   function dispatch(action: A) {
     if (!isPlainObject(action)) {
@@ -271,14 +271,14 @@ export default function createStore<
   }
 
   /**
-   * Replaces the reducer currently used by the store to calculate the state.
+   * ストアが状態を計算するために現在使用しているリデューサを置き換えます。
    *
-   * You might need this if your app implements code splitting and you want to
-   * load some of the reducers dynamically. You might also need this if you
-   * implement a hot reloading mechanism for Redux.
+   * アプリがコード分割を実装していて、一部のリデューサを動的にロードしたい場合に必要になるかもしれません。
+   * レデューサの一部を動的にロードしたい場合に必要になります。また、以下のような場合にも必要となるでしょう。
+   * Reduxのホットリロード機構を実装する。
    *
-   * @param nextReducer The reducer for the store to use instead.
-   * @returns The same store instance with a new reducer in place.
+   * @param nextReducer 代わりに使用するストアのリデューサです。
+   * @returns 新しいレデューサーが導入された、同じストアインスタンスです。
    */
   function replaceReducer<NewState, NewActions extends A>(
     nextReducer: Reducer<NewState, NewActions>
@@ -294,12 +294,12 @@ export default function createStore<
     // TODO: do this more elegantly
     ;(currentReducer as unknown as Reducer<NewState, NewActions>) = nextReducer
 
-    // This action has a similar effect to ActionTypes.INIT.
-    // Any reducers that existed in both the new and old rootReducer
-    // will receive the previous state. This effectively populates
-    // the new state tree with any relevant data from the old one.
+    // このアクションは、ActionTypes.INITと同様の効果があります。
+    // 新旧両方のrootReducerに存在していたすべてのレデューサーは
+    // は以前の状態を受け取ります。これにより、効果的に新しいステートツリーに
+    // 新しいステートツリーに、古いステートから関連するデータを投入します。
     dispatch({ type: ActionTypes.REPLACE } as A)
-    // change the type of the store by casting it to the new store
+    // 新しいストアにキャストしてストアのタイプを変更する
     return store as unknown as Store<
       ExtendState<NewState, StateExt>,
       NewActions,
@@ -310,21 +310,21 @@ export default function createStore<
   }
 
   /**
-   * Interoperability point for observable/reactive libraries.
-   * @returns A minimal observable of state changes.
-   * For more information, see the observable proposal:
+   * observable/reactiveライブラリの相互運用ポイント。
+   * @returns 状態変化の最小オブザーバブル。
+   * 詳細は observable proposal を参照してください。
    * https://github.com/tc39/proposal-observable
    */
   function observable() {
     const outerSubscribe = subscribe
     return {
       /**
-       * The minimal observable subscription method.
-       * @param observer Any object that can be used as an observer.
-       * The observer object should have a `next` method.
-       * @returns An object with an `unsubscribe` method that can
-       * be used to unsubscribe the observable from the store, and prevent further
-       * emission of values from the observable.
+       * 最小限のobservable購読方法です。
+       * @param observer オブザーバーとして使用できる任意のオブジェクト。
+       * @param observer オブザーバとして使用できるオブジェクト * observer オブジェクトは `next` メソッドを持つ必要があります。
+       * @returns `unsubscribe` メソッドを持つオブジェクトです。
+       * このメソッドは、オブザーバブルをストアからアンサブスクライブして、オブザーバブルからの値の放出を防ぐために使用できます。
+       * observable からの値の放出を防ぐことができます。
        */
       subscribe(observer: unknown) {
         if (typeof observer !== 'object' || observer === null) {
@@ -353,9 +353,9 @@ export default function createStore<
     }
   }
 
-  // When a store is created, an "INIT" action is dispatched so that every
-  // reducer returns their initial state. This effectively populates
-  // the initial state tree.
+  // ストアが作成されると、"INIT "アクションがディスパッチされて、すべての
+  // レデューサがそれぞれの初期状態を返すようにします。これにより、効果的に初期状態ツリーに
+  // 初期状態のツリーを作成します。
   dispatch({ type: ActionTypes.INIT } as A)
 
   const store = {

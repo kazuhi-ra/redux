@@ -10,23 +10,23 @@ import {
 import { Reducer } from './types/reducers'
 
 /**
- * Creates a store enhancer that applies middleware to the dispatch method
- * of the Redux store. This is handy for a variety of tasks, such as expressing
- * asynchronous actions in a concise manner, or logging every action payload.
+ * Redux ストアのディスパッチメソッドにミドルウェアを適用するストアエンハンサーを作成します。
+ * Reduxストアのディスパッチメソッドにミドルウェアを適用するストアエンハンサーを作成します。これは、次のような様々なタスクに便利です。
+ * 非同期アクションを簡潔に表現したり、アクションのペイロードをすべてログに記録するなど、さまざまな作業に便利です。
  *
- * See `redux-thunk` package as an example of the Redux middleware.
+ * Reduxのミドルウェアの例として、`redux-thunk`パッケージを参照してください。
  *
- * Because middleware is potentially asynchronous, this should be the first
- * store enhancer in the composition chain.
+ * ミドルウェアは潜在的に非同期であるため、これはコンポジションチェーンの最初の
+ * コンポジションチェーンにおけるストアエンハンサーです。
  *
- * Note that each middleware will be given the `dispatch` and `getState` functions
- * as named arguments.
+ * 各ミドルウェアには、名前付き引数として `dispatch` と `getState` 関数が与えられることに注意してください。
+ * 名前付き引数として与えられます。
  *
- * @param middlewares The middleware chain to be applied.
- * @returns A store enhancer applying the middleware.
+ * @param middlewares 適用されるミドルウェアチェーンです。
+ * @returns ミドルウェアを適用したストアエンハンサーです。
  *
- * @template Ext Dispatch signature added by a middleware.
- * @template S The type of the state supported by a middleware.
+ * @template Ext ミドルウェアが追加するディスパッチ署名。
+ * @template S ミドルウェアがサポートする状態のタイプ。
  */
 export default function applyMiddleware(): StoreEnhancer
 export default function applyMiddleware<Ext1, S>(

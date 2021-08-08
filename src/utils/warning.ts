@@ -1,7 +1,7 @@
 /**
- * Prints a warning in the console if it exists.
+ * 存在する場合は、コンソールに警告を表示します。
  *
- * @param message The warning message.
+ * @param message 警告メッセージです。
  */
 export default function warning(message: string): void {
   /* eslint-disable no-console */
@@ -10,9 +10,9 @@ export default function warning(message: string): void {
   }
   /* eslint-enable no-console */
   try {
-    // This error was thrown as a convenience so that if you enable
-    // "break on all exceptions" in your console,
-    // it would pause the execution at this line.
+    // このエラーは利便性のために投げられたもので、もしあなたがコンソールで
+    // コンソールで "break on all exceptions" を有効にすると、 // この行で実行を一時停止します。
+    // この行で実行を一時停止させるためです。
     throw new Error(message)
   } catch (e) {} // eslint-disable-line no-empty
 }
