@@ -113,27 +113,35 @@ export default function createStore<
   // 引数のバリデーション
   if (typeof reducer !== 'function') {
     throw new Error(
-      `Expected the root reducer to be a function. Instead, received: '${kindOf(
+      `reducerが関数であることを期待していましたが、こちらを受け取りました: '${kindOf(
         reducer
       )}'`
     )
   }
 
   // TODO
-  // reducer, state, listenerといった値は上書きされるっぽい？
+  // reducer, preloadedStateを上書き可能な変数に代入している
+  // listenerの初期値として空の配列を用意して、その後はまだよう分からん
+  // listener周りはあとでコードで登場するはず
+  // listenerは「ディスパッチごとに呼び出されるコールバックです」だそう
   let currentReducer = reducer
   let currentState = preloadedState as S
-  let currentListeners: (() => void)[] | null = []
-  let nextListeners = currentListeners
+  let currentListeners: (() => void)[] | null = [] // 関数を値に持つ配列
+  let nextListeners = currentListeners // 「dispatch中の一時的なリスト」らしい↓
   let isDispatching = false
 
   /**
-   * currentListenersの浅いコピーを作成し、ディスパッチ中の一時的なリストとしてnextListenersを使用できるようにします。
-   * nextListenersをディスパッチ中の一時的なリストとして使用できるようにします。
+   * currentListenersのshallow copyを作成し、dispatch中の一時的なリストとしてnextListenersを使用できるようにします。
+   * nextListenersをdispatch中の一時的なリストとして使用できるようにします。
    *
-   * ディスパッチ中にコンシューマーが subscribe/unubscribe を呼び出すようなバグを防ぎます。
-   * ディスパッチの最中にコンシューマが subscribe/unubscribe を呼び出すバグを防ぎます。
+   * dispatch中にコンシューマーが subscribe/unubscribe を呼び出すようなバグを防ぎます。
+   * dispatchの最中にコンシューマが subscribe/unubscribe を呼び出すバグを防ぎます。
    */
+
+  // nextListenersとcurrentListenersの参照を切り離してる？
+  // nextListeners === currentListenersは
+  // let nextListeners = currentListenersの時点ではtrueになり
+  // この関数の実行後はfalseになる
   function ensureCanMutateNextListeners() {
     if (nextListeners === currentListeners) {
       nextListeners = currentListeners.slice()
@@ -145,12 +153,14 @@ export default function createStore<
    *
    * @returns アプリケーションの現在のステート・ツリーです。
    */
+  // dispatch中でなければcurrentStateを返す
+  // redux-thunkでよく登場する馴染みがあるやつ
   function getState(): S {
     if (isDispatching) {
       throw new Error(
-        'You may not call store.getState() while the reducer is executing. ' +
-          'The reducer has already received the state as an argument. ' +
-          'Pass it down from the top reducer instead of reading it from the store.'
+        'reducerの実行中にstore.getState()を呼び出すことはできません。' +
+          'reducerは、すでに引数としてstateを受け取っています。' +
+          'storeから読み取る代わりにtopのreducerから渡してください' // ここ訳が変かも
       )
     }
 
@@ -181,6 +191,7 @@ export default function createStore<
    * @returns この変更リスナーを削除する関数です。
    */
   function subscribe(listener: () => void) {
+    // 引数のバリデーション
     if (typeof listener !== 'function') {
       throw new Error(
         `Expected the listener to be a function. Instead, received: '${kindOf(
@@ -189,21 +200,24 @@ export default function createStore<
       )
     }
 
+    // dispatchされてから呼び出すためにはコールバックでstore.getState()してくれ、とのこと
+    // getState()を使うときは最新のstateが欲しいからdispatch中は呼び出せないようにしたい、ってことかな
     if (isDispatching) {
       throw new Error(
-        'You may not call store.subscribe() while the reducer is executing. ' +
-          'If you would like to be notified after the store has been updated, subscribe from a ' +
-          'component and invoke store.getState() in the callback to access the latest state. ' +
+        'reducerの実行中にstore.subscribe()を呼び出すことはできません。' +
+          'storeが更新された後に通知を受けたい場合は、コンポーネントからサブスクライブして、' +
+          'コールバックでstore.getState() を呼び出して最新の状態にアクセスします。' +
           'See https://redux.js.org/api/store#subscribelistener for more details.'
       )
     }
 
     let isSubscribed = true
 
-    ensureCanMutateNextListeners()
-    nextListeners.push(listener)
+    ensureCanMutateNextListeners() // nextListeners = currentListeners.slice()が実行される
+    nextListeners.push(listener) // ↑で更新されたnextListenersにこの関数(subscribe)の引数をpushする
 
     return function unsubscribe() {
+      // isSubscribedがfalseの時に呼び出されても何もしない
       if (!isSubscribed) {
         return
       }
@@ -217,10 +231,10 @@ export default function createStore<
 
       isSubscribed = false
 
-      ensureCanMutateNextListeners()
+      ensureCanMutateNextListeners() // nextListeners = currentListeners.slice()が実行される
       const index = nextListeners.indexOf(listener)
-      nextListeners.splice(index, 1)
-      currentListeners = null
+      nextListeners.splice(index, 1) // nextListenersの配列からlistenerだけが削除される
+      currentListeners = null // 初期化される 型にnullが含まれてたのはこのためか 空の配列だとダメだったのかな
     }
   }
 
