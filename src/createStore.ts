@@ -389,8 +389,9 @@ export default function createStore<
   // ストアが作成されると、"INIT "アクションがディスパッチされて、すべての
   // レデューサがそれぞれの初期状態を返すようにします。これにより、効果的に初期状態ツリーに
   // 初期状態のツリーを作成します。
-  dispatch({ type: ActionTypes.INIT } as A)
+  dispatch({ type: ActionTypes.INIT } as A) // INITをdispatch
 
+  // storeに全部まとめて、それをreturnする
   const store = {
     dispatch: dispatch as Dispatch<A>,
     subscribe,
