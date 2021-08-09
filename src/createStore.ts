@@ -1,6 +1,9 @@
 import $$observable from './utils/symbol-observable'
+import ActionTypes from './utils/actionTypes'
+import isPlainObject from './utils/isPlainObject'
+import { kindOf } from './utils/kindOf'
 
-import {
+import type {
   Store,
   PreloadedState,
   StoreEnhancer,
@@ -10,15 +13,13 @@ import {
 } from './types/store'
 import { Action } from './types/actions'
 import { Reducer } from './types/reducers'
-import ActionTypes from './utils/actionTypes'
-import isPlainObject from './utils/isPlainObject'
-import { kindOf } from './utils/kindOf'
 
 /**
  * ステートツリーを保持するReduxストアを作成します。
  * ストア内のデータを変更する唯一の方法は、ストア上で `dispatch()` を呼び出すことです。
  *
- * アプリ内には1つのストアしか存在してはいけません。ステートツリーの異なる部分がどのように反応するかを指定するには
+ * アプリ内には1つのストアしか存在してはいけません。
+ * ステートツリーの異なる部分がどのように反応するかを指定するには
  * ステートツリーの異なる部分がアクションに反応する方法を指定するために、複数のリデューサを1つのリデューサ関数にまとめることができます。
  * 複数のリデューサを1つのリデューサ関数にまとめるには、`combineReducers`を使います。
  *
@@ -39,14 +40,15 @@ import { kindOf } from './utils/kindOf'
  * @returns 状態の読み取り、アクションのディスパッチ、変更の購読を可能にする Redux ストア。
  * 変更を購読することができます。
  */
+// ---------------------------------------------------------- 引数2,3個のパターンに分けて関数のオーバーロードをしている ----------------------------------------------------------------
 export default function createStore<
-  S,
-  A extends Action,
+  S, // S is state
+  A extends Action, // A is Action
   Ext = {},
   StateExt = never
 >(
   reducer: Reducer<S, A>,
-  enhancer?: StoreEnhancer<Ext, StateExt>
+  enhancer?: StoreEnhancer<Ext, StateExt> // 引数2個
 ): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
 export default function createStore<
   S,
@@ -56,7 +58,7 @@ export default function createStore<
 >(
   reducer: Reducer<S, A>,
   preloadedState?: PreloadedState<S>,
-  enhancer?: StoreEnhancer<Ext, StateExt>
+  enhancer?: StoreEnhancer<Ext, StateExt> // 引数3個
 ): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
 export default function createStore<
   S,
@@ -68,37 +70,47 @@ export default function createStore<
   preloadedState?: PreloadedState<S> | StoreEnhancer<Ext, StateExt>,
   enhancer?: StoreEnhancer<Ext, StateExt>
 ): Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext {
+  // 引数のバリデーション
   if (
     (typeof preloadedState === 'function' && typeof enhancer === 'function') ||
     (typeof enhancer === 'function' && typeof arguments[3] === 'function')
   ) {
     throw new Error(
-      'It looks like you are passing several store enhancers to ' +
-        'createStore(). This is not supported. Instead, compose them ' +
-        'together to a single function. See https://redux.js.org/tutorials/fundamentals/part-4-store#creating-a-store-with-enhancers for an example.'
+      'createStore()に複数のstore enhancerを渡しているようです。これはサポートされていません。代わりに、それらを1つの関数にまとめてください。' +
+        'See https://redux.js.org/tutorials/fundamentals/part-4-store#creating-a-store-with-enhancers for an example.'
     )
   }
 
+  // 引数が2つで, 2つ目がfunctionだったらenhancerとして扱う
   if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
     enhancer = preloadedState as StoreEnhancer<Ext, StateExt>
     preloadedState = undefined
   }
 
+  // 引数のバリデーション
   if (typeof enhancer !== 'undefined') {
     if (typeof enhancer !== 'function') {
       throw new Error(
-        `Expected the enhancer to be a function. Instead, received: '${kindOf(
+        `enhancerが関数であることを期待していましたが、こちらを受け取りました: '${kindOf(
           enhancer
         )}'`
       )
     }
 
+    // TODO
+    // enhancerは高階関数
+    // createStore自身を渡すことでその先で拡張をさせてるっぽい
+    // enhancer(createStore)の返り値もcreateStoreと同じで,
+    // reducerとpreloadedStateを引数に受け取る
     return enhancer(createStore)(
       reducer,
       preloadedState as PreloadedState<S>
     ) as Store<ExtendState<S, StateExt>, A, StateExt, Ext> & Ext
   }
 
+  // ---------------------------------------------------------- enhancerがあった時はここまで ----------------------------------------------------------------
+
+  // 引数のバリデーション
   if (typeof reducer !== 'function') {
     throw new Error(
       `Expected the root reducer to be a function. Instead, received: '${kindOf(
@@ -107,6 +119,8 @@ export default function createStore<
     )
   }
 
+  // TODO
+  // reducer, state, listenerといった値は上書きされるっぽい？
   let currentReducer = reducer
   let currentState = preloadedState as S
   let currentListeners: (() => void)[] | null = []
