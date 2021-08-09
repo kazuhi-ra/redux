@@ -242,9 +242,7 @@ export default function createStore<
    * アクションをディスパッチします。状態変化を引き起こす唯一の方法です。
    *
    * ストアの作成に使用される `reducer` 関数は、現在のステートツリーと与えられた `action` を使って呼び出されます。
-   * 現在のステートツリーと、与えられた `アクション` で呼び出されます。その戻り値は
-   * ツリーの **次** の状態とみなされ、変更リスナーに通知されます。
-   * 通知されます。
+   * その戻り値はツリーの **次** の状態とみなされ、変更リスナーに通知されます。
    *
    * 基本的な実装では、プレーンなオブジェクトアクションのみをサポートしています。もし、次のようなことをしたい場合
    * Promise、Observable、Thunkなどをディスパッチしたい場合は、ストア作成関数を対応するミドルウェアにラップする必要があります。
@@ -264,14 +262,16 @@ export default function createStore<
    * dispatch()をラップして別のものを返すことがあります（例えば、waitできるPromiseなど）。
    */
   function dispatch(action: A) {
+    // 引数のバリデーション
     if (!isPlainObject(action)) {
       throw new Error(
-        `Actions must be plain objects. Instead, the actual type was: '${kindOf(
+        `ActionはプレーンObjectでなければいけませんが、渡されたのは次の型でした: '${kindOf(
           action
-        )}'. You may need to add middleware to your store setup to handle dispatching other values, such as 'redux-thunk' to handle dispatching functions. See https://redux.js.org/tutorials/fundamentals/part-4-store#middleware and https://redux.js.org/tutorials/fundamentals/part-6-async-logic#using-the-redux-thunk-middleware for examples.`
+        )}'. プレーンObject以外を渡すためにはミドルウェアを使ってください`
       )
     }
 
+    // actionにtype(とそのvalue)は必須
     if (typeof action.type === 'undefined') {
       throw new Error(
         'Actions may not have an undefined "type" property. You may have misspelled an action type string constant.'
@@ -279,23 +279,28 @@ export default function createStore<
     }
 
     if (isDispatching) {
-      throw new Error('Reducers may not dispatch actions.')
+      throw new Error('reducerはactionをdispatchできません.')
     }
 
+    // 実行中と完了時にisDispatchingの値を変更する
     try {
       isDispatching = true
-      currentState = currentReducer(currentState, action)
+      currentState = currentReducer(currentState, action) // reducerを実行してstateを書き換える
     } finally {
       isDispatching = false
     }
 
+    // TODO
+    // currentListeners = nextListeners ....？？？
+    // あ、ensureCanMutateNextListeners()で切り離した参照を復活させてるのか
     const listeners = (currentListeners = nextListeners)
     for (let i = 0; i < listeners.length; i++) {
+      // 全部のlistenerを実行する
       const listener = listeners[i]
       listener()
     }
 
-    return action
+    return action // voidかと思ってたけどactionを返すのか〜
   }
 
   /**
